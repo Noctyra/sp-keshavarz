@@ -182,7 +182,9 @@ export function activate(context: vscode.ExtensionContext) {
             prompt: "Enter the mutation name (camelCase)",
             placeHolder: "updateUser",
             validateInput: (val) => {
-              if (!val) return "Mutation name is required.";
+              if (!val) {
+                return "Mutation name is required.";
+              }
               if (!/^([a-z]+[A-Za-z0-9]*)$/.test(val)) {
                 return "Mutation name must be camelCase (e.g., updateUser)";
               }
