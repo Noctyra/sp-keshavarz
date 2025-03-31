@@ -2,6 +2,13 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import {
+  getImportPath,
+  injectHookImport,
+  injectPropsImport,
+  replaceNameInContent,
+  titleCase,
+} from "./helpers.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -9,42 +16,20 @@ const __dirname = dirname(__filename);
 const TEMPLATE_DIR = path.join(__dirname, "templates");
 const SRC_DIR = process.argv[4];
 
-const replaceNameInContent = (content, original, replacement) =>
-  content.replaceAll(original, replacement);
-
-const titleCase = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-
-const injectPropsImport = (content, componentName, importPath) => {
-  const propsName = `${titleCase(componentName)}Props`;
-  const importLine = `import { ${propsName} } from "${importPath}";\n`;
-  return content.includes(importLine) ? content : importLine + content;
-};
-
-const injectHookImport = (content, componentName, importPath) => {
-  const hookName = `use${titleCase(componentName)}`;
-  const importLine = `import ${hookName} from "${importPath}";\n`;
-  return content.includes(importLine) ? content : importLine + content;
-};
-
-const getImportPath = (componentPath, componentName) => {
-  const typesFile = path.join(componentPath, `${componentName}.types.ts`);
-  const relativeToSrc = path.relative(SRC_DIR, typesFile);
-  return relativeToSrc.startsWith("..")
-    ? `./${componentName}.types`
-    : `@/${relativeToSrc.replace(/\\/g, "/")}`;
-};
-
 const createComponent = async () => {
   const inputPath = path.resolve(process.argv[2] || ".");
   const componentName = process.argv[3];
 
   if (!componentName || !/^[a-z][A-Za-z0-9]*$/.test(componentName)) {
-    console.error("❌ Invalid component name. Use camelCase (e.g. myButton)");
+    console.error(
+      "❌ Invalid component name. Use camelCase (e.g. myButton)",
+      componentName
+    );
     process.exit(1);
   }
 
   const componentPath = path.join(inputPath, componentName);
-  const importPath = getImportPath(componentPath, componentName);
+  const importPath = getImportPath(componentPath, componentName, SRC_DIR);
 
   await fs.mkdir(componentPath, { recursive: true });
 

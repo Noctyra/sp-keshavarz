@@ -1,0 +1,10 @@
+import { useMutation } from "@tanstack/react-query";
+import { sampleMutationFn } from "IMPORT_FUNCTION";
+
+const useSampleMutationMutation = () => {
+  return useMutation({
+    mutationFn: sampleMutationFn,
+  });
+};
+
+export default useSampleMutationMutation;

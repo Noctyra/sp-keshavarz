@@ -1,0 +1,13 @@
+import { queryOptions } from "@tanstack/react-query";
+import { SampleQueryParams } from "IMPORT_TYPES";
+import sampleQueryQueryFunction from "IMPORT_FUNCTION";
+
+const sampleQueryQueryOptions = ({}: SampleQueryParams) => {
+  return queryOptions({
+    queryKey: ["sampleQuery"],
+    queryFn: sampleQueryQueryFunction,
+    select: (data) => data.response,
+  });
+};
+
+export default sampleQueryQueryOptions;

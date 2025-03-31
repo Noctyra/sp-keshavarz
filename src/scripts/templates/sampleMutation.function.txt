@@ -1,0 +1,15 @@
+import { fetchApi } from "@/settings/axiosConfig";
+import { GlobalData } from "@/types/responses/responsesTypes";
+import {
+    SampleMutationMutationPayload,
+    SampleMutationMutationParams, 
+    SampleMutationMutationResponse,
+} from "IMPORT_TYPES";
+
+export const sampleMutationFn = ({
+  data
+}: {
+  data: SampleMutationMutationPayload;
+  params: SampleMutationMutationParams;
+}): Promise<GlobalData<SampleMutationMutationResponse>> =>
+  fetchApi.patch(``, data);

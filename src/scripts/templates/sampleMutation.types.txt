@@ -1,0 +1,5 @@
+export type SampleMutationMutationPayload = {};
+
+export type SampleMutationMutationParams = {};
+
+export type SampleMutationMutationResponse = {};
