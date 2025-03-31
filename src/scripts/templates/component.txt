@@ -1,0 +1,10 @@
+import { Box } from "@mui/material";
+
+const myComponent = (props: myComponentProps) => {
+  const {} = props;
+  const {} = useMyComponent(props);
+
+  return <Box>myComponent component works :)</Box>;
+};
+
+export default myComponent;

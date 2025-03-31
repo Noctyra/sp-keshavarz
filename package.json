@@ -14,22 +14,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "sp-keshavarz.testMyScript",
-        "title": "Test my script"
+        "command": "sp-keshavarz.runScriptPicker",
+        "title": "My Workflow"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "sp-keshavarz.testMyScript",
-          "when": "resourceUri.scheme == 'file'",
-          "group": "navigation"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "sp-keshavarz.testMyScript",
-          "when": "true"
+          "command": "sp-keshavarz.runScriptPicker",
+          "when": "explorerResourceIsFolder",
+          "group": "2_modification"
         }
       ]
     }
