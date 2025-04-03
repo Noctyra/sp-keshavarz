@@ -1,7 +1,7 @@
 {
   "name": "sp-keshavarz",
   "displayName": "sp-keshavarz",
-  "description": "",
+  "description": "Vscode extension for work",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.54.0"
@@ -12,6 +12,10 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Noctyra/sp-keshavarz.git"
+  },
   "contributes": {
     "commands": [
       {
