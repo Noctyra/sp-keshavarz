@@ -1,11 +1,29 @@
-.vscode/**
-.vscode-test/**
-src/**
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/eslint.config.mjs
-**/*.map
+# .vscode/**
+# .vscode-test/**
+# src/**
+# .gitignore
+# .yarnrc
+# vsc-extension-quickstart.md
+# **/tsconfig.json
+# **/eslint.config.mjs
+# **/*.map
+# **/*.ts
+# **/.vscode-test.*
+
+# Ignore test folders and dev-only configs
+.vscode/
+.vscode-test/
+tests/
 **/*.ts
-**/.vscode-test.*
+**/*.map
+**/*.test.js
+**/*.test.ts
+**/*.test.tsx
+**/__mocks__/
+
+# Ignore stuff unrelated to the extension runtime
+README.md
+CHANGELOG.md
+tsconfig.json
+.yarnrc
+.vsc-extension-quickstart.md
