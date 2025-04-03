@@ -26,7 +26,25 @@
           "group": "2_modification"
         }
       ]
-    }
+    },
+    "snippets": [
+      {
+        "language": "javascript",
+        "path": "./snippets/react-snippets.json"
+      },
+      {
+        "language": "javascriptreact",
+        "path": "./snippets/react-snippets.json"
+      },
+      {
+        "language": "typescript",
+        "path": "./snippets/react-snippets.json"
+      },
+      {
+        "language": "typescriptreact",
+        "path": "./snippets/react-snippets.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",

@@ -1,0 +1,45 @@
+{
+  "React Hook Form Setup": {
+    "prefix": "frm",
+    "body": [
+      "const { control, handleSubmit } = useForm${1}<${2}>({",
+      "  defaultValues: {",
+      "    $3",
+      "  },",
+      "  resolver: yupResolver${4}(${5})",
+      "});"
+    ],
+    "description": "React Hook Form setup with yupResolver"
+  },
+  "React Query with options": {
+    "prefix": "qr",
+    "body": ["const { data, isPending${3} } = useQuery${1}(${2})"],
+    "description": "React Query with custom options function"
+  },
+  "FormBuilder Field": {
+    "prefix": "fb",
+    "body": [
+      "{",
+      "  type: \"${1}\",",
+      "  control,",
+      "  name: \"${2}\",",
+      "  label: { id: \"${3}\" },${4}",
+      "},"
+    ],
+    "description": "FormBuilder field"
+  },
+  "useMemo declaration": {
+    "prefix": "memo",
+    "body": [
+      "const ${1} = useMemo${2}(() => {",
+      "  return ${3};",
+      "}, [${4}]);"
+    ],
+    "description": "Memoize data"
+  },
+  "use Watch": {
+    "prefix": "watch",
+    "body": ["const [${3}] = useWatch${1}({ control, name: [${2}] })"],
+    "description": "use watch"
+  }
+}
