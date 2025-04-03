@@ -2,6 +2,7 @@
   "name": "sp-keshavarz",
   "displayName": "sp-keshavarz",
   "description": "Vscode extension for work",
+  "publisher": "Noctyra",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.54.0"
