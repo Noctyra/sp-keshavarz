@@ -15,8 +15,6 @@ export function activate(context: vscode.ExtensionContext) {
         "✨ Generate Icon",
         "📡 Generate Sample Query",
         "📤 Generate Sample Mutation",
-        "Build Module",
-        "Create Test Suite",
       ];
 
       const selection = await vscode.window.showQuickPick(options, {
@@ -224,18 +222,6 @@ export function activate(context: vscode.ExtensionContext) {
 
           break;
         }
-
-        case "Build Module":
-          vscode.window.showInformationMessage(
-            `🔧 Building module in ${folderPath}`
-          );
-          break;
-
-        case "Create Test Suite":
-          vscode.window.showInformationMessage(
-            `🧪 Creating tests in ${folderPath}`
-          );
-          break;
 
         default:
           vscode.window.showWarningMessage("Unknown option selected.");
