@@ -3,7 +3,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import {
-  getImportPath,
   injectHookImport,
   injectPropsImport,
   replaceNameInContent,
@@ -15,6 +14,21 @@ const __dirname = dirname(__filename);
 
 const TEMPLATE_DIR = path.join(__dirname, "templates");
 const SRC_DIR = path.resolve(process.argv[4] || "src");
+
+export const getImportPath = (filePath) => {
+  const workspaceFolder = process.cwd();
+  const srcPath = path.join(workspaceFolder, "src");
+  const normalized = path.normalize(filePath);
+  const srcIndex = normalized.indexOf(path.normalize("/src/"));
+
+  if (srcIndex === -1) {
+    console.error("❌ Could not resolve path relative to src:", normalized);
+    process.exit(1);
+  }
+
+  const relativeToSrc = normalized.substring(srcIndex + "/src/".length);
+  return `@/${relativeToSrc.replace(/\\/g, "/")}`;
+};
 
 const createComponent = async () => {
   try {
@@ -30,10 +44,8 @@ const createComponent = async () => {
     }
 
     const componentPath = path.join(inputPath, componentName);
-    const importPath = getImportPath(componentPath, componentName, SRC_DIR);
-
-    console.log("🛠 Creating component:", componentName);
-    console.log("📂 Output path:", componentPath);
+    const typesFile = path.join(componentPath, `${componentName}.types.ts`);
+    const importPath = getImportPath(typesFile);
 
     await fs.mkdir(componentPath, { recursive: true });
 
