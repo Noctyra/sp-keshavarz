@@ -17,10 +17,50 @@ export const injectHookImport = (content, componentName, importPath) => {
   return content.includes(importLine) ? content : importLine + content;
 };
 
-export const getImportPath = (componentPath, componentName, SRC_DIR) => {
-  const typesFile = path.join(componentPath, `${componentName}.types.ts`);
-  const relativeToSrc = path.relative(SRC_DIR, typesFile);
-  return relativeToSrc.startsWith("..")
-    ? `./${componentName}.types`
-    : `@/${relativeToSrc.replace(/\\/g, "/")}`;
+/**
+ * The alias is resolved by the extension from the owning package's tsconfig and
+ * handed over in the environment, because it differs per project:
+ * `@/*` -> `./src/*` (vite apps), `@/*` -> `./*` (next app), `#shared/*` -> `src/*`.
+ */
+export const readAliasFromEnv = () => {
+  const prefix = process.env.SPK_ALIAS_PREFIX;
+  const baseDir = process.env.SPK_ALIAS_BASE_DIR;
+
+  if (!prefix || !baseDir) {
+    return null;
+  }
+
+  return {
+    prefix,
+    baseDir,
+    allowTsExtensions: process.env.SPK_ALLOW_TS_EXT === "1",
+  };
+};
+
+/**
+ * Absolute import for `absFile` when the alias is known, otherwise a relative
+ * one from `fromDir` so generation still produces valid code.
+ */
+export const buildImportPath = (absFile, alias, fromDir) => {
+  if (alias) {
+    const relative = path
+      .relative(alias.baseDir, absFile)
+      .split(path.sep)
+      .join("/");
+
+    if (!relative.startsWith("..")) {
+      const specifier = alias.allowTsExtensions
+        ? relative
+        : relative.replace(/\.tsx?$/, "");
+      return `${alias.prefix}${specifier}`;
+    }
+  }
+
+  const relative = path
+    .relative(fromDir ?? path.dirname(absFile), absFile)
+    .split(path.sep)
+    .join("/")
+    .replace(/\.tsx?$/, "");
+
+  return relative.startsWith(".") ? relative : `./${relative}`;
 };

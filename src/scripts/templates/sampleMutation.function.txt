@@ -1,5 +1,5 @@
-import { fetchApi } from "@/settings/axiosConfig";
-import { GlobalData } from "@/types/responses/responsesTypes";
+import { fetchApi } from "IMPORT_API_CLIENT";
+import { GlobalData } from "IMPORT_RESPONSE_TYPES";
 import {
     SampleMutationMutationPayload,
     SampleMutationMutationParams, 

@@ -3,8 +3,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import {
+  buildImportPath,
   injectHookImport,
   injectPropsImport,
+  readAliasFromEnv,
   replaceNameInContent,
   titleCase,
 } from "./helpers.js";
@@ -13,22 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const TEMPLATE_DIR = path.join(__dirname, "templates");
-const SRC_DIR = path.resolve(process.argv[4] || "src");
-
-export const getImportPath = (filePath) => {
-  const workspaceFolder = process.cwd();
-  const srcPath = path.join(workspaceFolder, "src");
-  const normalized = path.normalize(filePath);
-  const srcIndex = normalized.indexOf(path.normalize("/src/"));
-
-  if (srcIndex === -1) {
-    console.error("❌ Could not resolve path relative to src:", normalized);
-    process.exit(1);
-  }
-
-  const relativeToSrc = normalized.substring(srcIndex + "/src/".length);
-  return `@/${relativeToSrc.replace(/\\/g, "/")}`;
-};
+const alias = readAliasFromEnv();
 
 const createComponent = async () => {
   try {
@@ -45,7 +32,9 @@ const createComponent = async () => {
 
     const componentPath = path.join(inputPath, componentName);
     const typesFile = path.join(componentPath, `${componentName}.types.ts`);
-    const importPath = getImportPath(typesFile);
+    const bizFile = path.join(componentPath, `${componentName}.biz.ts`);
+    const importPath = buildImportPath(typesFile, alias, componentPath);
+    const hookImportPath = buildImportPath(bizFile, alias, componentPath);
 
     await fs.mkdir(componentPath, { recursive: true });
 
@@ -87,7 +76,6 @@ const createComponent = async () => {
           "useMyComponent",
           `use${componentTitle}`
         );
-        const hookImportPath = importPath.replace(".types", ".biz");
         content = injectHookImport(content, componentName, hookImportPath);
       } else if (file.type === "hook") {
         content = replaceNameInContent(

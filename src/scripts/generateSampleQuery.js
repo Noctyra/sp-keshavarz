@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { titleCase } from "./helpers.js";
+import { buildImportPath, readAliasFromEnv, titleCase } from "./helpers.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,19 +14,7 @@ if (!camelCaseRegex.test(baseName)) {
   process.exit(1);
 }
 
-function getImportPath(filePath) {
-  const normalized = path.normalize(filePath);
-  const srcIndex = normalized.indexOf(path.normalize("/src/"));
-
-  if (srcIndex === -1) {
-    console.error("❌ Could not resolve path relative to src:", normalized);
-    process.exit(1);
-  }
-
-  const relativeToSrc = normalized.substring(srcIndex + "/src/".length);
-  return `@/${relativeToSrc.replace(/\\/g, "/")}`;
-}
-
+const alias = readAliasFromEnv();
 const TitleCaseName = titleCase(baseName);
 
 const templates = [
@@ -48,9 +36,6 @@ const TEMPLATE_DIR = path.join(__dirname, "templates");
 const queryFolderName = `${baseName}Query`;
 const outputFolder = path.join(targetFolder, queryFolderName);
 
-const workspaceFolder = process.cwd();
-const SRC_DIR = path.join(workspaceFolder, "src");
-
 fs.mkdirSync(outputFolder, { recursive: true });
 
 templates.forEach(({ file, output }) => {
@@ -65,23 +50,34 @@ templates.forEach(({ file, output }) => {
   let content = fs.readFileSync(templatePath, "utf-8");
 
   content = content
+    .replaceAll("IMPORT_API_CLIENT", process.env.SPK_IMPORT_API_CLIENT ?? "")
+    .replaceAll(
+      "IMPORT_RESPONSE_TYPES",
+      process.env.SPK_IMPORT_RESPONSE_TYPES ?? ""
+    )
     .replaceAll("sampleQuery", baseName)
     .replaceAll("SampleQuery", TitleCaseName);
 
   if (file.includes("function")) {
-    const typesPath = getImportPath(
-      path.join(outputFolder, `${baseName}.types.ts`)
+    const typesPath = buildImportPath(
+      path.join(outputFolder, `${baseName}.types.ts`),
+      alias,
+      outputFolder
     );
 
     content = content.replaceAll("IMPORT_TYPES", typesPath);
   }
 
   if (file.includes("options")) {
-    const typesPath = getImportPath(
-      path.join(outputFolder, `${baseName}.types.ts`)
+    const typesPath = buildImportPath(
+      path.join(outputFolder, `${baseName}.types.ts`),
+      alias,
+      outputFolder
     );
-    const fnPath = getImportPath(
-      path.join(outputFolder, `${baseName}.function.ts`)
+    const fnPath = buildImportPath(
+      path.join(outputFolder, `${baseName}.function.ts`),
+      alias,
+      outputFolder
     );
 
     content = content

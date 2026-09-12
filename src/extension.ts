@@ -1,10 +1,75 @@
 import * as vscode from "vscode";
 import * as cp from "child_process";
 import * as path from "path";
+import { buildGeneratorContext } from "./generatorContext";
 
 const camelCaseRegex = /^([a-z]+[A-Za-z0-9]*)$/;
 
 export function activate(context: vscode.ExtensionContext) {
+  const output = vscode.window.createOutputChannel("My Workflow");
+
+  const runScript = (scriptName: string, folderPath: string, args: string[]) => {
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(
+      vscode.Uri.file(folderPath)
+    );
+    const generatorContext = buildGeneratorContext(
+      folderPath,
+      workspaceFolder?.uri.fsPath
+    );
+
+    const scriptPath = path.join(context.extensionPath, "src/scripts", scriptName);
+
+    output.appendLine(`$ ${scriptName} ${args.join(" ")}`);
+    output.appendLine(`  folder: ${folderPath}`);
+    output.appendLine(`  tsconfig: ${generatorContext.configFile ?? "none"}`);
+    output.appendLine(
+      `  alias: ${
+        generatorContext.env.SPK_ALIAS_PREFIX
+          ? `${generatorContext.env.SPK_ALIAS_PREFIX}* -> ${generatorContext.env.SPK_ALIAS_BASE_DIR}`
+          : "none (relative imports)"
+      }`
+    );
+
+    for (const warning of generatorContext.warnings) {
+      output.appendLine(`  ⚠️ ${warning}`);
+      vscode.window.showWarningMessage(warning);
+    }
+
+    return new Promise<number | null>((resolve) => {
+      const child = cp.spawn("node", [scriptPath, folderPath, ...args], {
+        env: { ...process.env, ...generatorContext.env },
+      });
+
+      child.stdout?.on("data", (data) => output.append(String(data)));
+      child.stderr?.on("data", (data) => output.append(String(data)));
+      child.on("error", (error) => {
+        output.appendLine(`  ❌ ${error.message}`);
+        resolve(null);
+      });
+      child.on("exit", (code) => resolve(code));
+    });
+  };
+
+  const askForName = (
+    prompt: string,
+    placeHolder: string,
+    label: string,
+    example: string
+  ) =>
+    vscode.window.showInputBox({
+      prompt,
+      placeHolder,
+      validateInput: (val) => {
+        if (!val) {
+          return `${label} name is required.`;
+        }
+        if (!camelCaseRegex.test(val)) {
+          return `${label} name must be camelCase (e.g., ${example})`;
+        }
+        return null;
+      },
+    });
+
   const disposable = vscode.commands.registerCommand(
     "sp-keshavarz.runScriptPicker",
     async (uri) => {
@@ -28,197 +93,116 @@ export function activate(context: vscode.ExtensionContext) {
 
       switch (selection) {
         case "⚙️ Generate Component": {
-          const componentName = await vscode.window.showInputBox({
-            prompt: "Enter the component name (camelCase)",
-            placeHolder: "myComponent",
-            validateInput: (val) => {
-              if (!val) {
-                return "Component name is required.";
-              }
-              if (!camelCaseRegex.test(val)) {
-                return "Component name must be camelCase (e.g., myComponent, userCard)";
-              }
-              return null;
-            },
-          });
+          const componentName = await askForName(
+            "Enter the component name (camelCase)",
+            "myComponent",
+            "Component",
+            "myComponent, userCard"
+          );
 
           if (!componentName) {
             vscode.window.showErrorMessage("Component name is required.");
             return;
           }
 
-          const extensionRoot = context.extensionPath;
+          const code = await runScript("generateComponent.js", folderPath, [
+            componentName,
+          ]);
 
-          const scriptPath = path.join(
-            extensionRoot,
-            "src/scripts",
-            "generateComponent.js"
-          );
-
-          const workspaceFolder =
-            vscode.workspace.workspaceFolders?.[0].uri.fsPath;
-          const srcDir = path.join(workspaceFolder ?? "", "src");
-
-          const child = cp.spawn(
-            "node",
-            [scriptPath, folderPath, componentName, srcDir],
-            {
-              stdio: "inherit",
-            }
-          );
-
-          child.on("exit", (code) => {
-            if (code === 0) {
-              vscode.window.showInformationMessage(
-                `Component "${componentName}" created in ${folderPath}`
-              );
-            } else if (code === 1) {
-              vscode.window.showErrorMessage("Name must be camel case");
-            } else {
-              vscode.window.showErrorMessage("Failed to generate component.");
-            }
-          });
+          if (code === 0) {
+            vscode.window.showInformationMessage(
+              `Component "${componentName}" created in ${folderPath}`
+            );
+          } else if (code === 1) {
+            vscode.window.showErrorMessage("Name must be camel case");
+          } else {
+            vscode.window.showErrorMessage("Failed to generate component.");
+          }
 
           break;
         }
         case "✨ Generate Icon": {
-          const iconName = await vscode.window.showInputBox({
-            prompt: "Enter the icon name (camelCase)",
-            placeHolder: "arrowDown",
-            validateInput: (val) => {
-              if (!val) {
-                return "Icon name is required.";
-              }
-              if (!camelCaseRegex.test(val)) {
-                return "Icon name must be camelCase (e.g., arrowDown, playNext)";
-              }
-              return null;
-            },
-          });
+          const iconName = await askForName(
+            "Enter the icon name (camelCase)",
+            "arrowDown",
+            "Icon",
+            "arrowDown, playNext"
+          );
 
           if (!iconName) {
             vscode.window.showErrorMessage("Icon name is required.");
             return;
           }
 
-          const extensionRoot = context.extensionPath;
+          const code = await runScript("generateIcon.js", folderPath, [
+            iconName,
+          ]);
 
-          const scriptPath = path.join(
-            extensionRoot,
-            "src/scripts",
-            "generateIcon.js"
-          );
-
-          const child = cp.spawn("node", [scriptPath, folderPath, iconName], {
-            stdio: "inherit",
-          });
-
-          child.on("exit", (code) => {
-            if (code === 0) {
-              vscode.window.showInformationMessage(
-                `Icon "${iconName}" created in ${folderPath}`
-              );
-            } else if (code === 1) {
-              vscode.window.showErrorMessage("Icon name must be camelCase.");
-            } else {
-              vscode.window.showErrorMessage("Failed to generate icon.");
-            }
-          });
+          if (code === 0) {
+            vscode.window.showInformationMessage(
+              `Icon "${iconName}" created in ${folderPath}`
+            );
+          } else if (code === 1) {
+            vscode.window.showErrorMessage("Icon name must be camelCase.");
+          } else {
+            vscode.window.showErrorMessage("Failed to generate icon.");
+          }
 
           break;
         }
         case "📡 Generate Sample Query": {
-          const queryName = await vscode.window.showInputBox({
-            prompt: "Enter the query name (camelCase)",
-            placeHolder: "getUserProfile",
-            validateInput: (val) => {
-              if (!val) {
-                return "Query name is required.";
-              }
-              if (!camelCaseRegex.test(val)) {
-                return "Query name must be camelCase (e.g., getUserProfile)";
-              }
-              return null;
-            },
-          });
+          const queryName = await askForName(
+            "Enter the query name (camelCase)",
+            "getUserProfile",
+            "Query",
+            "getUserProfile"
+          );
 
           if (!queryName) {
             vscode.window.showErrorMessage("Query name is required.");
             return;
           }
 
-          const extensionRoot = context.extensionPath;
+          const code = await runScript("generateSampleQuery.js", folderPath, [
+            queryName,
+          ]);
 
-          const scriptPath = path.join(
-            extensionRoot,
-            "src/scripts",
-            "generateSampleQuery.js"
-          );
-
-          const child = cp.spawn("node", [scriptPath, folderPath, queryName], {
-            stdio: "inherit",
-          });
-
-          child.on("exit", (code) => {
-            if (code === 0) {
-              vscode.window.showInformationMessage(
-                `Sample query "${queryName}" created in ${folderPath}`
-              );
-            } else if (code === 1) {
-              vscode.window.showErrorMessage("Query name must be camelCase.");
-            } else {
-              vscode.window.showErrorMessage(
-                "Failed to generate sample query."
-              );
-            }
-          });
+          if (code === 0) {
+            vscode.window.showInformationMessage(
+              `Sample query "${queryName}" created in ${folderPath}`
+            );
+          } else if (code === 1) {
+            vscode.window.showErrorMessage("Query name must be camelCase.");
+          } else {
+            vscode.window.showErrorMessage("Failed to generate sample query.");
+          }
 
           break;
         }
         case "📤 Generate Sample Mutation": {
-          const mutationName = await vscode.window.showInputBox({
-            prompt: "Enter the mutation name (camelCase)",
-            placeHolder: "updateUser",
-            validateInput: (val) => {
-              if (!val) {
-                return "Mutation name is required.";
-              }
-              if (!/^([a-z]+[A-Za-z0-9]*)$/.test(val)) {
-                return "Mutation name must be camelCase (e.g., updateUser)";
-              }
-              return null;
-            },
-          });
+          const mutationName = await askForName(
+            "Enter the mutation name (camelCase)",
+            "updateUser",
+            "Mutation",
+            "updateUser"
+          );
 
           if (!mutationName) {
             vscode.window.showErrorMessage("Mutation name is required.");
             return;
           }
 
-          const extensionRoot = context.extensionPath;
-          const scriptPath = path.join(
-            extensionRoot,
-            "src/scripts",
-            "generateSampleMutation.js"
-          );
+          const code = await runScript("generateSampleMutation.js", folderPath, [
+            mutationName,
+          ]);
 
-          const child = cp.spawn(
-            "node",
-            [scriptPath, folderPath, mutationName],
-            {
-              stdio: "inherit",
-            }
-          );
-
-          child.on("exit", (code) => {
-            if (code === 0) {
-              vscode.window.showInformationMessage(
-                `Mutation "${mutationName}" created in ${folderPath}`
-              );
-            } else {
-              vscode.window.showErrorMessage("Failed to generate mutation.");
-            }
-          });
+          if (code === 0) {
+            vscode.window.showInformationMessage(
+              `Mutation "${mutationName}" created in ${folderPath}`
+            );
+          } else {
+            vscode.window.showErrorMessage("Failed to generate mutation.");
+          }
 
           break;
         }
@@ -229,7 +213,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  context.subscriptions.push(disposable);
+  context.subscriptions.push(disposable, output);
 }
 
 export function deactivate() {}

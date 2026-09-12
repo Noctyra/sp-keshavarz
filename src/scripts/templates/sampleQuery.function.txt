@@ -1,5 +1,5 @@
-import { fetchApi } from "@/settings/axiosConfig.ts";
-import { GlobalData } from "@/types/responses/responsesTypes.ts";
+import { fetchApi } from "IMPORT_API_CLIENT";
+import { GlobalData } from "IMPORT_RESPONSE_TYPES";
 import { SampleQueryParams, SampleQueryResponse } from "IMPORT_TYPES";
 
 const sampleQueryQueryFunction = ({}: SampleQueryParams): Promise<GlobalData<SampleQueryResponse>> => {
