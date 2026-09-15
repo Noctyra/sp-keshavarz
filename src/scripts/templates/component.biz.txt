@@ -1,8 +1,0 @@
-
-const useMyComponent = (props: MyComponentProps) => {
-  const {} = props;
-
-  return {};
-};
-
-export default useMyComponent;

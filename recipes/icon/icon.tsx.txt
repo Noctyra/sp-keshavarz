@@ -1,0 +1,13 @@
+import { createSvgIcon } from "@mui/material";
+
+const <<pascal name>>Icon = createSvgIcon(
+  <svg viewBox="<<1:0 0 19 19>>" fill="none">
+    <path
+      d="<<2>>"
+      fill="currentColor"
+    />
+  </svg>,
+  "<<pascal name>>Icon"
+);
+
+export default <<pascal name>>Icon;

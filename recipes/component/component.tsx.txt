@@ -1,0 +1,12 @@
+import { Box } from "@mui/material";
+import use<<pascal name>> from "<<import biz>>";
+import { <<pascal name>>Props } from "<<import types>>";
+
+const <<pascal name>> = (props: <<pascal name>>Props) => {
+  const { <<1>> } = props;
+  const { <<2>> } = use<<pascal name>>(props);
+
+  return <Box><<0>></Box>;
+};
+
+export default <<pascal name>>;

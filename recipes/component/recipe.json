@@ -1,0 +1,32 @@
+{
+  "label": "$(symbol-method) Component",
+  "detail": "component.tsx + .types.ts + .biz.ts",
+  "noun": "Component",
+  "placeholder": "myComponent",
+  "example": "myComponent, userCard",
+  "order": 10,
+  "hints": [
+    "components",
+    "kit",
+    "common"
+  ],
+  "folder": "<<name>>",
+  "files": [
+    {
+      "id": "component",
+      "path": "<<name>>.tsx",
+      "template": "component.tsx.txt",
+      "primary": true
+    },
+    {
+      "id": "types",
+      "path": "<<name>>.types.ts",
+      "template": "types.txt"
+    },
+    {
+      "id": "biz",
+      "path": "<<name>>.biz.ts",
+      "template": "biz.txt"
+    }
+  ]
+}

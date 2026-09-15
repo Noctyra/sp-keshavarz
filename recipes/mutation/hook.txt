@@ -1,0 +1,10 @@
+import { useMutation } from "@tanstack/react-query";
+import { <<name>>Fn } from "<<import function>>";
+
+const use<<pascal name>>Mutation = () => {
+  return useMutation({
+    mutationFn: <<name>>Fn,
+  });
+};
+
+export default use<<pascal name>>Mutation;

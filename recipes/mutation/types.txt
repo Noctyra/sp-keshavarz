@@ -1,0 +1,5 @@
+export type <<pascal name>>MutationPayload = {<<1>>};
+
+export type <<pascal name>>MutationParams = {<<2>>};
+
+export type <<pascal name>>MutationResponse = {<<3>>};

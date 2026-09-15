@@ -1,0 +1,14 @@
+import { fetchApi } from "<<import apiClient>>";
+import { GlobalData } from "<<import responseTypes>>";
+import {
+  <<pascal name>>MutationPayload,
+  <<pascal name>>MutationParams,
+  <<pascal name>>MutationResponse,
+} from "<<import types>>";
+
+export const <<name>>Fn = ({
+  data,
+}: {
+  data: <<pascal name>>MutationPayload;
+  params: <<pascal name>>MutationParams;
+}): Promise<GlobalData<<<pascal name>>MutationResponse>> => fetchApi.post(`<<1>>`, data);

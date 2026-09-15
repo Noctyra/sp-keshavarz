@@ -12,8 +12,6 @@ export type PackageContext = {
   /** The tsconfig that actually owns the clicked folder. */
   configFile: string;
   mappings: AliasMapping[];
-  /** `compilerOptions.allowImportingTsExtensions` — decides whether imports keep `.ts`. */
-  allowTsExtensions: boolean;
 };
 
 const isWin = process.platform === "win32";
@@ -121,7 +119,6 @@ type RawConfig = {
   file: string;
   paths?: Record<string, string[]>;
   pathsBaseDir?: string;
-  allowTsExtensions?: boolean;
   references: string[];
 };
 
@@ -174,8 +171,6 @@ const readConfig = (
     if (parent) {
       merged.paths = parent.paths ?? merged.paths;
       merged.pathsBaseDir = parent.pathsBaseDir ?? merged.pathsBaseDir;
-      merged.allowTsExtensions =
-        parent.allowTsExtensions ?? merged.allowTsExtensions;
     }
   }
 
@@ -188,10 +183,6 @@ const readConfig = (
     merged.pathsBaseDir = compilerOptions.baseUrl
       ? path.resolve(dir, String(compilerOptions.baseUrl))
       : dir;
-  }
-
-  if (typeof compilerOptions.allowImportingTsExtensions === "boolean") {
-    merged.allowTsExtensions = compilerOptions.allowImportingTsExtensions;
   }
 
   if (Array.isArray(json.references)) {
@@ -276,11 +267,7 @@ const contextFromDir = (dir: string, targetDir: string) => {
     for (const candidate of candidates) {
       const mappings = toMappings(candidate);
       if (mappings.some((mapping) => isInside(mapping.baseDir, targetDir))) {
-        return {
-          configFile: candidate.file,
-          mappings,
-          allowTsExtensions: candidate.allowTsExtensions === true,
-        };
+        return { configFile: candidate.file, mappings };
       }
     }
   }
@@ -335,28 +322,24 @@ export const bestMapping = (context: PackageContext, absPath: string) => {
   return best;
 };
 
-export const toImportPath = (
-  absFile: string,
-  mapping: AliasMapping,
-  allowTsExtensions: boolean
-) => {
+/**
+ * Extensions are always stripped. `allowImportingTsExtensions` permits `.ts` in
+ * a specifier but never requires it, so the extensionless form is the one that
+ * compiles in every project — which is the point of a project-independent tool.
+ */
+export const toImportPath = (absFile: string, mapping: AliasMapping) => {
   const relative = path
     .relative(mapping.baseDir, absFile)
     .split(path.sep)
     .join("/");
-  const specifier = allowTsExtensions
-    ? relative
-    : relative.replace(/\.tsx?$/, "");
 
-  return `${mapping.prefix}${specifier}`;
+  return `${mapping.prefix}${relative.replace(/\.tsx?$/, "")}`;
 };
 
 /** Builds the alias specifier for any file the context can reach. */
 export const specifierFor = (context: PackageContext, absFile: string) => {
   const mapping = bestMapping(context, absFile);
-  return mapping
-    ? toImportPath(absFile, mapping, context.allowTsExtensions)
-    : undefined;
+  return mapping ? toImportPath(absFile, mapping) : undefined;
 };
 
 export const findPackageRoot = (startDir: string, stopDir?: string) => {

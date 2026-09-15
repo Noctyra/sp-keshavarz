@@ -1,0 +1,9 @@
+import { <<pascal name>>Props } from "<<import types>>";
+
+const use<<pascal name>> = (props: <<pascal name>>Props) => {
+  const { <<1>> } = props;
+
+  return {<<2>>};
+};
+
+export default use<<pascal name>>;

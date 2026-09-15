@@ -1,0 +1,11 @@
+import { fetchApi } from "<<import apiClient>>";
+import { GlobalData } from "<<import responseTypes>>";
+import { <<pascal name>>Params, <<pascal name>>Response } from "<<import types>>";
+
+const <<name>>QueryFunction = ({
+  <<2>>
+}: <<pascal name>>Params): Promise<GlobalData<<<pascal name>>Response>> => {
+  return fetchApi.get(`<<1>>`);
+};
+
+export default <<name>>QueryFunction;

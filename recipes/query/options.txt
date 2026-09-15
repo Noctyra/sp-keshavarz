@@ -1,0 +1,13 @@
+import { queryOptions } from "@tanstack/react-query";
+import { <<pascal name>>Params } from "<<import types>>";
+import <<name>>QueryFunction from "<<import function>>";
+
+const <<name>>QueryOptions = ({ <<1>> }: <<pascal name>>Params) => {
+  return queryOptions({
+    queryKey: ["<<name>>"<<2>>],
+    queryFn: <<name>>QueryFunction,
+    select: (data) => data.response,
+  });
+};
+
+export default <<name>>QueryOptions;

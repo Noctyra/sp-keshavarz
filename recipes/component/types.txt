@@ -1,0 +1,1 @@
+export type <<pascal name>>Props = {<<1>>};

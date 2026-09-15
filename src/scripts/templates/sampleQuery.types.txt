@@ -1,3 +1,0 @@
-export type SampleQueryResponse = {};
-
-export type SampleQueryParams = {};

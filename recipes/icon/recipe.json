@@ -1,0 +1,23 @@
+{
+  "label": "$(symbol-color) Icon",
+  "detail": "a createSvgIcon wrapper, ready to paste a path into",
+  "noun": "Icon",
+  "placeholder": "arrowDown",
+  "example": "arrowDown, playNext",
+  "order": 20,
+  "hints": [
+    "icons"
+  ],
+  "anchor": [
+    "icons",
+    "assets/icons"
+  ],
+  "folder": ".",
+  "files": [
+    {
+      "id": "icon",
+      "path": "<<name>>Icon.tsx",
+      "template": "icon.tsx.txt"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "label": "$(cloud-upload) Mutation",
+  "detail": ".function.ts + use<Name>.ts + .types.ts",
+  "noun": "Mutation",
+  "placeholder": "updateUser",
+  "example": "updateUser",
+  "order": 40,
+  "hints": ["mutations"],
+  "prompts": [
+    { "name": "module", "label": "Which module?", "dirs": "src/modules" }
+  ],
+  "target": "src/modules/<<module>>/mutations",
+  "folder": "<<name>>Mutation",
+  "files": [
+    {
+      "id": "function",
+      "path": "<<name>>.function.ts",
+      "template": "function.txt",
+      "primary": true
+    },
+    { "id": "types", "path": "<<name>>.types.ts", "template": "types.txt" },
+    { "id": "hook", "path": "use<<pascal name>>.ts", "template": "hook.txt" }
+  ]
+}

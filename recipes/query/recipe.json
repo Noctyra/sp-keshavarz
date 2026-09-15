@@ -1,0 +1,24 @@
+{
+  "label": "$(cloud-download) Query",
+  "detail": ".function.ts + .options.ts + .types.ts",
+  "noun": "Query",
+  "placeholder": "getUserProfile",
+  "example": "getUserProfile",
+  "order": 30,
+  "hints": ["queries"],
+  "prompts": [
+    { "name": "module", "label": "Which module?", "dirs": "src/modules" }
+  ],
+  "target": "src/modules/<<module>>/queries",
+  "folder": "<<name>>Query",
+  "files": [
+    {
+      "id": "function",
+      "path": "<<name>>.function.ts",
+      "template": "function.txt",
+      "primary": true
+    },
+    { "id": "types", "path": "<<name>>.types.ts", "template": "types.txt" },
+    { "id": "options", "path": "<<name>>.options.ts", "template": "options.txt" }
+  ]
+}
